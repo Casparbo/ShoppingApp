@@ -29,12 +29,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   List<String> locations = <String>["Lidl", "Fridge"];
   String selectedLocation = "";
 
+  @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     selectedLocation = locations.first;
   }
 
+  @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
@@ -73,6 +75,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
             child: Text("Inb4 Storage Items")
           ,)
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        foregroundColor: Colors.white,
+        backgroundColor: themeColor,
+        child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomAppBar(
         color: themeColor,
