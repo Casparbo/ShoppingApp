@@ -1,4 +1,7 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
+import 'package:shopping_app/model/item.dart';
 
 Color themeColor = Colors.teal.shade900;
 
@@ -26,13 +29,26 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late final TabController _tabController;
-  List<String> locations = <String>["Lidl", "Fridge"];
+
+  HashSet<String> stores = HashSet<String>();
+  HashSet<String> locations = HashSet<String>();
   String selectedLocation = "";
+  String selectedStore = "";
+
+  List<Item> items = <Item>[Item(name: "Test", store: "Lidl", location: "Fridge"), Item(name: "Test2", store: "Aldi", location: "Regal")];
+
+  void loadStoresLocations() {
+    for(final Item(:store, :location) in items) {
+      stores.add(store);
+      locations.add(location);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    loadStoresLocations();
     selectedLocation = locations.first;
   }
 
