@@ -9,8 +9,8 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'Shopping App',
-      home: MyHomePage(title: 'Shopping App'),
+      title: 'Shoppymara',
+      home: MyHomePage(title: 'Shoppymara'),
     );
   }
 }
