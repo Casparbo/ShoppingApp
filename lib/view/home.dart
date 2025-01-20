@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   HashSet<String> locations = HashSet<String>();
   String selectedLocation = "";
   String selectedStore = "";
+  bool storeView = true;
 
   List<Item> items = <Item>[Item(name: "Test", store: "Lidl", location: "Fridge"), Item(name: "Test2", store: "Aldi", location: "Regal")];
 
@@ -48,8 +49,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    _tabController.addListener((){
+      if(!_tabController.indexIsChanging) {
+        setState(() {
+          storeView = !storeView;
+        });
+      }
+    });
+
     loadStoresLocations();
     selectedLocation = locations.first;
+    selectedStore = stores.first;
   }
 
   @override
@@ -108,13 +119,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
             suffixIconColor: Colors.white,
           ),
           width: double.infinity,
-          initialSelection: selectedLocation,
+          initialSelection: (storeView ? selectedStore : selectedLocation),
           onSelected: (String? value) {
             setState(() {
-              selectedLocation = value!;
+              if(storeView) {
+                selectedStore = value!;
+              } else {
+                selectedLocation = value!;
+              }
             });
           },
-          dropdownMenuEntries: locations.map<DropdownMenuEntry<String>>((String value) {
+          dropdownMenuEntries: (storeView ? stores : locations).map<DropdownMenuEntry<String>>((String value) {
             return DropdownMenuEntry<String>(value: value, label: value);
           }).toList(),
         ),
