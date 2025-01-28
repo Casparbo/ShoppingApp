@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:shopping_app/model/item.dart';
+import 'package:shopping_app/view/item_list.dart';
 
 Color themeColor = Colors.teal.shade900;
 
@@ -36,7 +37,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   String selectedStore = "";
   bool storeView = true;
 
-  List<Item> items = <Item>[Item(name: "Test", store: "Lidl", location: "Fridge"), Item(name: "Test2", store: "Aldi", location: "Regal")];
+  List<Item> items = <Item>[
+    Item(name: "Milk", store: "Lidl", location: "Fridge"),
+    Item(name: "Oats", store: "Aldi", location: "Regal"),
+    Item(name: "Lube", store: "Lidl", location: "Regal")
+  ];
 
   void loadStoresLocations() {
     for(final Item(:store, :location) in items) {
@@ -94,12 +99,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       ),
       body: TabBarView(
         controller: _tabController,
-        children: const <Widget>[
+        children: <Widget>[
           Center(
-            child: Text("Inb4 Shopping Items"),
+            child: ItemList(themeColor: themeColor, items: items.where((Item value) {
+                return value.store == selectedStore;
+              }).toList()),
           ),
           Center(
-            child: Text("Inb4 Storage Items")
+            child: ItemList(themeColor: themeColor, items: items.where((Item value) {
+                return value.location == selectedLocation;
+              }).toList())
           ,)
         ],
       ),
