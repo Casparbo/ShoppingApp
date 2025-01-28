@@ -36,7 +36,7 @@ class ItemList extends StatelessWidget {
 					  children: [
 					  	FilledButton.tonal(
 					  		style: ButtonStyle(
-					  			foregroundColor: WidgetStatePropertyAll(Colors.black),
+					  			foregroundColor: const WidgetStatePropertyAll(Colors.black),
 					  			backgroundColor: WidgetStateColor.resolveWith(buttonColors),
 					  		),
 					    	onPressed: () {},
