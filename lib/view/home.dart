@@ -43,6 +43,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     Item(name: "Lube", store: "Lidl", location: "Regal")
   ];
 
+  void setItemStocked(Item item, bool value) {
+    setState(() {
+      item.stocked = value;
+    });
+  }
+
+  void deleteItem(Item item) {
+    setState(() {
+      items.remove(item);
+    });
+  }
+
   void loadStoresLocations() {
     for(final Item(:store, :location) in items) {
       stores.add(store);
@@ -100,15 +112,27 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
+          // Shopping
           Center(
-            child: ItemList(themeColor: themeColor, items: items.where((Item value) {
-                return value.store == selectedStore;
-              }).toList()),
+            child: ItemList(
+              themeColor: themeColor,
+              items: items.where((Item value) {
+                return value.store == selectedStore && !value.stocked;
+              }).toList(),
+              setItemStocked: setItemStocked,
+              deleteItem: deleteItem,
+            ),
           ),
+          // Storage
           Center(
-            child: ItemList(themeColor: themeColor, items: items.where((Item value) {
+            child: ItemList(
+              themeColor: themeColor,
+              items: items.where((Item value) {
                 return value.location == selectedLocation;
-              }).toList())
+              }).toList(),
+              setItemStocked: setItemStocked,
+              deleteItem: deleteItem,
+            )
           ,)
         ],
       ),
