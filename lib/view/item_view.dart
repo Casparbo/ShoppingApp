@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/model/item.dart';
 
-class ItemList extends StatefulWidget {
+class ItemView extends StatefulWidget {
 	final List<Item> items;
 	final Color themeColor;
 	final Function(Item item, bool value) setItemStocked;
 	final Function(Item item) deleteItem;
 
-	const ItemList({
+	const ItemView({
 		super.key, 
 		required this.items,
 		required this.themeColor,
@@ -15,14 +15,14 @@ class ItemList extends StatefulWidget {
 		this.deleteItem = _defaultDeleteItem
 	});
 
-	static _defaultItemStocked(Item item, bool value) {}
-	static _defaultDeleteItem(Item item) {}
+	static void _defaultItemStocked(Item item, bool value) {}
+	static void _defaultDeleteItem(Item item) {}
 
   @override
-  State<ItemList> createState() => _ItemListState();
+  State<ItemView> createState() => _ItemViewState();
 }
 
-class _ItemListState extends State<ItemList> {
+class _ItemViewState extends State<ItemView> {
 	Color buttonColors(Set<WidgetState> states) {
 		Color red = Colors.red.withValues(alpha: 0.5);
 		Color green = widget.themeColor.withValues(alpha: 0.5);

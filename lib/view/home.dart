@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:shopping_app/model/item.dart';
-import 'package:shopping_app/view/item_list.dart';
+import 'package:shopping_app/view/item_view.dart';
 
 Color themeColor = Colors.teal.shade900;
 
@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         children: <Widget>[
           // Shopping
           Center(
-            child: ItemList(
+            child: ItemView(
               themeColor: themeColor,
               items: items.where((Item value) {
                 return value.store == selectedStore && !value.stocked;
@@ -125,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
           ),
           // Storage
           Center(
-            child: ItemList(
+            child: ItemView(
               themeColor: themeColor,
               items: items.where((Item value) {
                 return value.location == selectedLocation;
