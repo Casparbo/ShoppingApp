@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 
 import 'package:shopping_app/model/item.dart';
+import 'package:shopping_app/view/create_item.dart';
 import 'package:shopping_app/view/item_view.dart';
 import 'package:shopping_app/model/item_storage.dart';
 
@@ -149,7 +150,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreateItem(themeColor: themeColor,)),
+          );
+        },
         foregroundColor: Colors.white,
         backgroundColor: themeColor,
         child: const Icon(Icons.add),
