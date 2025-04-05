@@ -1,8 +1,10 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+
 import 'package:shopping_app/model/item.dart';
 import 'package:shopping_app/view/item_view.dart';
+import 'package:shopping_app/model/item_storage.dart';
 
 Color themeColor = Colors.teal.shade900;
 
@@ -37,20 +39,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   String selectedStore = "";
   bool storeView = true;
 
-  List<Item> items = <Item>[
-    Item(name: "Milk", store: "Lidl", location: "Fridge"),
-    Item(name: "Oats", store: "Aldi", location: "Regal"),
-    Item(name: "Lube", store: "Lidl", location: "Regal")
-  ];
+  late ItemStorage storage;
+  List<Item> items = <Item>[];
 
   void setItemStocked(Item item, bool value) {
     setState(() {
       item.stocked = value;
     });
+    storage.writeItems(items);
   }
 
   void deleteItem(Item item) {
     setState(() {
+      stores.remove(item.store);
+      locations.remove(item.location);
       items.remove(item);
     });
   }
@@ -75,9 +77,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       }
     });
 
-    loadStoresLocations();
-    selectedLocation = locations.first;
-    selectedStore = stores.first;
+    initStorage();
+  }
+
+  Future<void> initStorage() async {
+    storage = await ItemStorage.create("items.txt");
+    List<Item> tmp = await storage.readItems();
+
+    setState(() {
+      items = tmp;
+      loadStoresLocations();
+      selectedLocation = locations.first;
+      selectedStore = stores.first;
+    });
   }
 
   @override
