@@ -50,6 +50,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     storage.writeItems(items);
   }
 
+  void addItem(Item item) {
+    setState(() {
+      items.add(item);
+      loadStoresLocations();
+    });
+    storage.writeItems(items);
+  }
+
   void deleteItem(Item item) {
     setState(() {
       stores.remove(item.store);
@@ -153,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CreateItem(themeColor: themeColor,)),
+            MaterialPageRoute(builder: (context) => CreateItem(themeColor: themeColor, addItem: addItem,)),
           );
         },
         foregroundColor: Colors.white,
