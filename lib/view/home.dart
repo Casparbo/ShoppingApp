@@ -64,6 +64,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       locations.remove(item.location);
       items.remove(item);
     });
+    storage.writeItems(items);
   }
 
   void loadStoresLocations() {
