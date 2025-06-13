@@ -4,13 +4,16 @@ class Item {
 	final String location;
 	bool stocked = true;
 
-	Item({required this.name, required this.store, required this.location});
+	Item({required String name, required String store, required String location}):
+		name = name.trim(),
+		store = store.trim(),
+		location = location.trim();
 
 	String toCsv() {
 		return "$name;$store;$location;$stocked";
 	}
 
-	static fromCsv(String csv) {
+	static Item fromCsv(String csv) {
 		List<String> fields = csv.split(";");
 
 		Item item = Item(name: fields[0], store: fields[1], location: fields[2]);
