@@ -16,8 +16,8 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'Shoppymara',
-      home: MyHomePage(title: 'Shoppymara'),
+      title: 'Groceries',
+      home: MyHomePage(title: 'Groceries'),
     );
   }
 }
@@ -46,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   void setItemStocked(Item item, bool value) {
     setState(() {
       item.stocked = value;
+      loadStoresLocations();
     });
     storage.writeItems(items);
   }
@@ -60,17 +61,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   void deleteItem(Item item) {
     setState(() {
-      stores.remove(item.store);
-      locations.remove(item.location);
       items.remove(item);
+      loadStoresLocations();
     });
     storage.writeItems(items);
   }
 
   void loadStoresLocations() {
-    for(final Item(:store, :location) in items) {
-      stores.add(store);
+    stores = HashSet<String>();
+    locations = HashSet<String>();
+
+    stores.add("ALL");
+    locations.add("ALL");
+
+    for(final Item(:store, :location, :stocked) in items) {
       locations.add(location);
+      if (!stocked) {
+        stores.add(store);
+      }
     }
   }
 
@@ -139,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
             child: ItemView(
               themeColor: themeColor,
               items: items.where((Item value) {
-                return value.store == selectedStore && !value.stocked;
+                return !value.stocked && (selectedStore=="ALL" || value.store == selectedStore);
               }).toList(),
               setItemStocked: setItemStocked,
               deleteItem: deleteItem,
@@ -149,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
           Center(
             child: ItemView(
               themeColor: themeColor,
-              items: items.where((Item value) {
+              items: selectedLocation == "ALL" ? items : items.where((Item value) {
                 return value.location == selectedLocation;
               }).toList(),
               setItemStocked: setItemStocked,
@@ -158,40 +166,61 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
           ,)
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CreateItem(themeColor: themeColor, addItem: addItem,)),
-          );
-        },
-        foregroundColor: Colors.white,
-        backgroundColor: themeColor,
-        child: const Icon(Icons.add),
-      ),
       bottomNavigationBar: BottomAppBar(
         color: themeColor,
-        child: DropdownMenu<String>(
-          textStyle: const TextStyle(color: Colors.white),
-          inputDecorationTheme: const InputDecorationTheme(
-            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
-            suffixIconColor: Colors.white,
-          ),
-          width: double.infinity,
-          initialSelection: (storeView ? selectedStore : selectedLocation),
-          onSelected: (String? value) {
-            setState(() {
-              if(storeView) {
-                selectedStore = value!;
-              } else {
-                selectedLocation = value!;
-              }
-            });
-          },
-          dropdownMenuEntries: (storeView ? stores : locations).map<DropdownMenuEntry<String>>((String value) {
-            return DropdownMenuEntry<String>(value: value, label: value);
-          }).toList(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: DropdownMenu<String>(
+                textStyle: const TextStyle(color: Colors.white),
+                inputDecorationTheme: const InputDecorationTheme(
+                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  suffixIconColor: Colors.white,
+                ),
+                width: double.infinity,
+                initialSelection: (storeView ? selectedStore : selectedLocation),
+                onSelected: (String? value) {
+                  setState(() {
+                    if(storeView) {
+                      selectedStore = value!;
+                    } else {
+                      selectedLocation = value!;
+                    }
+                  });
+                },
+                dropdownMenuEntries: (storeView ? stores : locations).map<DropdownMenuEntry<String>>((String value) {
+                  return DropdownMenuEntry<String>(value: value, label: value);
+                }).toList()..sort((a, b) {
+                    if(a.value=="ALL") {
+                      return -1;
+                    }
+                    if(b.value=="ALL") {
+                      return 1;
+                    }
+                    return 0;
+                  }),
+              ),
+            ),
+            SizedBox(
+              height: double.infinity,
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateItem(themeColor: themeColor, addItem: addItem,)),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: themeColor,
+                  iconSize: 25,
+                ),
+                child: const Icon(Icons.add),
+              ),
+            ),
+          ],
         ),
       ),
     );
