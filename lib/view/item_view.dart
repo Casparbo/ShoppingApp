@@ -44,11 +44,29 @@ class _ItemViewState extends State<ItemView> {
 			padding: const EdgeInsets.all(12),
 			itemCount: widget.items.length,
 			itemBuilder: (BuildContext context, int index) {
-				return SizedBox(
-					height: 50,
-					child: Row(
-					  children: [
-					  	FilledButton.tonal(
+				List<Widget> children = [
+					Expanded(
+				    	child: Text(
+					    	widget.items.elementAt(index).name,
+					    	style: const TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),
+					    ),
+				    ),
+				    Checkbox(
+				    	fillColor: WidgetStateColor.resolveWith(buttonColors),
+				    	value: widget.items.elementAt(index).stocked,
+				    	onChanged: (bool? value) {
+				    		widget.setItemStocked(widget.items.elementAt(index), value!);
+			    		},
+				    )
+				];
+
+				// hide delete button if no delete function added
+			    if(widget.deleteItem != ItemView._defaultDeleteItem) {
+			    	children.insert(0, const SizedBox(
+					    	width: 10,
+					    )
+			    	);
+			    	children.insert(0, FilledButton.tonal(
 					  		style: ButtonStyle(
 					  			backgroundColor: WidgetStateColor.resolveWith(buttonColors),
 					  			iconColor: const WidgetStatePropertyAll(Colors.black),
@@ -58,24 +76,14 @@ class _ItemViewState extends State<ItemView> {
 					    		widget.deleteItem(widget.items.elementAt(index));
 					    	},
 					    	child: const Icon(Icons.delete, size: 20,),
-					    ),
-					    const SizedBox(
-					    	width: 10,
-					    ),
-					    Expanded(
-					    	child: Text(
-						    	widget.items.elementAt(index).name,
-						    	style: const TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),
-						    ),
-					    ),
-					    Checkbox(
-					    	fillColor: WidgetStateColor.resolveWith(buttonColors),
-					    	value: widget.items.elementAt(index).stocked,
-					    	onChanged: (bool? value) {
-					    		widget.setItemStocked(widget.items.elementAt(index), value!);
-				    		},
 					    )
-					  ],
+			    	);
+			    }
+
+				return SizedBox(
+					height: 50,
+					child: Row(
+					  children: children,
 					),
 				);
 			},

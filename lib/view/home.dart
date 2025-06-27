@@ -6,6 +6,8 @@ import 'package:shopping_app/model/item.dart';
 import 'package:shopping_app/view/create_item.dart';
 import 'package:shopping_app/view/item_view.dart';
 import 'package:shopping_app/model/item_storage.dart';
+import 'package:shopping_app/view/select_store.dart';
+import 'package:shopping_app/view/shopping.dart';
 
 Color themeColor = Colors.teal.shade900;
 
@@ -80,6 +82,30 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         stores.add(store);
       }
     }
+  }
+
+  void shopStore(String store) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Shopping(
+        themeColor: themeColor,
+        items: items.where((Item item) {
+          return !item.stocked && (store == "ALL" || item.store == store);
+        }).toList(),
+        markAsStocked: markAsStocked,
+      ))
+    );
+  }
+
+  void markAsStocked(List<Item> toBeMarked) {
+    setState(() {
+      for(final Item mark in toBeMarked) {
+        Item i = items.firstWhere((item) => item == mark);
+        i.stocked = true;
+      }      
+    });
+    
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
@@ -171,6 +197,27 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            SizedBox(
+              height: double.infinity,
+              child: FilledButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SelectStore(
+                      themeColor: themeColor,
+                      stores: stores,
+                      shopStore: shopStore,
+                    )),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: themeColor,
+                  iconSize: 25,
+                ),
+                child: const Icon(Icons.playlist_add_check),
+              ),
+            ),
             Expanded(
               child: DropdownMenu<String>(
                 textStyle: const TextStyle(color: Colors.white),

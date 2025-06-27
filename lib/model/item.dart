@@ -31,4 +31,9 @@ class Item {
 
 	@override
 	int get hashCode => (name + store + location).hashCode;
+
+	@override
+	String toString() {
+		return toCsv();
+	}
 }
