@@ -34,13 +34,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
-  late final TabController _tabController;
-
-  HashSet<String> stores = HashSet<String>();
   HashSet<String> locations = HashSet<String>();
   String selectedLocation = "";
-  String selectedStore = "";
-  bool storeView = true;
 
   late ItemStorage storage;
   List<Item> items = <Item>[];
@@ -48,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   void setItemStocked(Item item, bool value) {
     setState(() {
       item.stocked = value;
-      loadStoresLocations();
+      loadLocations();
     });
     storage.writeItems(items);
   }
@@ -56,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   void addItem(Item item) {
     setState(() {
       items.add(item);
-      loadStoresLocations();
+      loadLocations();
     });
     storage.writeItems(items);
   }
@@ -64,24 +59,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   void deleteItem(Item item) {
     setState(() {
       items.remove(item);
-      loadStoresLocations();
+      loadLocations();
     });
     storage.writeItems(items);
   }
 
-  void loadStoresLocations() {
-    stores = HashSet<String>();
-    locations = HashSet<String>();
-
-    stores.add("ALL");
-    locations.add("ALL");
-
-    for(final Item(:store, :location, :stocked) in items) {
-      locations.add(location);
-      if (!stocked) {
-        stores.add(store);
-      }
-    }
+  void loadLocations() {
+    locations = HashSet.from(items.map((item) => item.location))..add("ALL");
   }
 
   void shopStore(String store) {
@@ -111,15 +95,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-
-    _tabController.addListener((){
-      if(!_tabController.indexIsChanging) {
-        setState(() {
-          storeView = !storeView;
-        });
-      }
-    });
 
     initStorage();
   }
@@ -130,16 +105,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
     setState(() {
       items = tmp;
-      loadStoresLocations();
+      loadLocations();
       selectedLocation = locations.first;
-      selectedStore = stores.first;
     });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   @override
@@ -149,48 +117,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         backgroundColor: themeColor,
         title: Text(widget.title),
         titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
-          indicatorSize: TabBarIndicatorSize.tab,
-          tabs: const <Widget>[
-            Tab(
-              child: Text("Shopping"),
-            ),
-            Tab(
-              child: Text("Storage"),
-            )
-          ]
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: <Widget>[
-          // Shopping
-          Center(
-            child: ItemView(
-              themeColor: themeColor,
-              items: items.where((Item value) {
-                return !value.stocked && (selectedStore=="ALL" || value.store == selectedStore);
-              }).toList(),
-              setItemStocked: setItemStocked,
-              deleteItem: deleteItem,
-            ),
-          ),
-          // Storage
-          Center(
-            child: ItemView(
-              themeColor: themeColor,
-              items: selectedLocation == "ALL" ? items : items.where((Item value) {
-                return value.location == selectedLocation;
-              }).toList(),
-              setItemStocked: setItemStocked,
-              deleteItem: deleteItem,
-            )
-          ,)
-        ],
+      body: Center(
+        child: ItemView(
+          themeColor: themeColor,
+          items: selectedLocation == "ALL" ? items : items.where((Item value) {
+            return value.location == selectedLocation;
+          }).toList(),
+          setItemStocked: setItemStocked,
+         deleteItem: deleteItem,
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
         color: themeColor,
@@ -205,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     context,
                     MaterialPageRoute(builder: (context) => SelectStore(
                       themeColor: themeColor,
-                      stores: stores,
+                      stores: HashSet.from(items.map<String>((item) => item.store).toSet())..add("ALL"),
                       shopStore: shopStore,
                     )),
                   );
@@ -227,17 +163,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                   suffixIconColor: Colors.white,
                 ),
                 width: double.infinity,
-                initialSelection: (storeView ? selectedStore : selectedLocation),
+                initialSelection: selectedLocation,
                 onSelected: (String? value) {
                   setState(() {
-                    if(storeView) {
-                      selectedStore = value!;
-                    } else {
-                      selectedLocation = value!;
-                    }
+                    selectedLocation = value!;
                   });
                 },
-                dropdownMenuEntries: (storeView ? stores : locations).map<DropdownMenuEntry<String>>((String value) {
+                dropdownMenuEntries:  locations.map<DropdownMenuEntry<String>>((String value) {
                   return DropdownMenuEntry<String>(value: value, label: value);
                 }).toList()..sort((a, b) {
                     if(a.value=="ALL") {
