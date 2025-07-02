@@ -168,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     context,
                     MaterialPageRoute(builder: (context) => SelectStore(
                       themeColor: themeColor,
-                      stores: HashSet.from(items.map<String>((item) => item.store).toSet())..add("ALL"),
+                      stores: HashSet.from(items.where((item) => !item.stocked).map<String>((item) => item.store).toSet())..add("ALL"),
                       shopStore: shopStore,
                     )),
                   );
