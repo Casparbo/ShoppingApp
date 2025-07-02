@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/model/item.dart';
 
-class CreateItem extends StatefulWidget {
+class EditItem extends StatefulWidget {
 	final Color themeColor;
 	final Function(Item item) addItem;
+	final Item item;
 
-	const CreateItem({
+	const EditItem({
 		super.key,
 		required this.themeColor,
-		this.addItem = _defaultAddItem
+		required this.item,
+		this.addItem = _defaultAddItem,
 	});
 
 	static void _defaultAddItem(Item item) {}
 
   @override
-  State<CreateItem> createState() => _CreateItemState();
+  State<EditItem> createState() => _EditItemState();
 }
 
-class _CreateItemState extends State<CreateItem> {
+class _EditItemState extends State<EditItem> {
 	final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-	Map<String, String> fields = {"Name":"", "Location": "", "Store": ""};
+	late Map<String, String> fields;
+
+	@override
+	  void initState() {
+	    super.initState();
+
+	    fields = {"Name": widget.item.name, "Location": widget.item.location, "Store": widget.item.store};
+	  }
 
 	@override
 	Widget build(BuildContext context) {
@@ -44,6 +53,7 @@ class _CreateItemState extends State<CreateItem> {
 									labelText: fields.keys.elementAt(index),
 									labelStyle: const TextStyle(color: Colors.black)
 								),
+								initialValue: fields[fields.keys.elementAt(index)],
 								validator: (String? value) {
 									if(value == null || value.isEmpty) {
 										return "Field is required";
@@ -52,23 +62,29 @@ class _CreateItemState extends State<CreateItem> {
 								},
 								onChanged: (value) {
 									fields[fields.keys.elementAt(index)] = value;
+
 								},
 							);
 						},
 					),
 				),
 			),
-			floatingActionButton: FloatingActionButton(
-				onPressed: () {
-					if(_formKey.currentState!.validate()) {
-						Item item = Item(name: fields["Name"]!, store: fields["Store"]!, location: fields["Location"]!);
-						widget.addItem(item);
-						Navigator.pop(context);
-					}
-				},
-				foregroundColor: Colors.white,
-		        backgroundColor: widget.themeColor,
-		        child: const Icon(Icons.check),
+			bottomNavigationBar: BottomAppBar(
+				color: widget.themeColor,
+				child: FilledButton(
+					onPressed: () {
+						if(_formKey.currentState!.validate()) {
+							Item item = Item(name: fields["Name"]!, store: fields["Store"]!, location: fields["Location"]!);
+							widget.addItem(item);
+							Navigator.pop(context);
+						}
+					},
+					style: FilledButton.styleFrom(
+						foregroundColor: Colors.white,
+				        backgroundColor: widget.themeColor,
+					),
+			        child: const Icon(Icons.check),
+				),
 			),
 		);
 	}

@@ -22,6 +22,10 @@ class Item {
 		return item;
 	}
 
+	bool isEmpty() {
+		return name.isEmpty || location.isEmpty || store.isEmpty;
+	}
+
 	@override
 	bool operator ==(Object other) =>
 		other is Item &&

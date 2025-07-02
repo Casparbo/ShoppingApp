@@ -2,12 +2,12 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
-import 'package:shopping_app/model/item.dart';
-import 'package:shopping_app/view/create_item.dart';
+import 'package:shopping_app/view/edit_item.dart';
 import 'package:shopping_app/view/item_view.dart';
-import 'package:shopping_app/model/item_storage.dart';
 import 'package:shopping_app/view/select_store.dart';
 import 'package:shopping_app/view/shopping.dart';
+import 'package:shopping_app/model/item_storage.dart';
+import 'package:shopping_app/model/item.dart';
 
 Color themeColor = Colors.teal.shade900;
 
@@ -54,6 +54,32 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       loadLocations();
     });
     storage.writeItems(items);
+  }
+
+  void editItem(Item item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditItem(
+          themeColor: themeColor,
+          addItem: itemReplacer(item),
+          item: item,
+        )
+      ),
+    );
+  }
+
+  Function(Item) itemReplacer(Item item) {
+    return (Item jtem) {
+      jtem.stocked = item.stocked;
+      if(!jtem.isEmpty()) {
+        setState(() {
+          items.remove(item);
+          items.add(jtem);
+          loadLocations();
+        });
+      }
+    };
   }
 
   void deleteItem(Item item) {
@@ -125,7 +151,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
             return value.location == selectedLocation;
           }).toList(),
           setItemStocked: setItemStocked,
-         deleteItem: deleteItem,
+          deleteItem: deleteItem,
+          editItem: editItem,
         ),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -188,7 +215,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CreateItem(themeColor: themeColor, addItem: addItem,)),
+                    MaterialPageRoute(
+                      builder: (context) => EditItem(
+                        themeColor: themeColor,
+                        addItem: addItem,
+                        item: Item(name: "", store: "", location: ""),
+                      )
+                    ),
                   );
                 },
                 style: FilledButton.styleFrom(

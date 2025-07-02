@@ -6,17 +6,20 @@ class ItemView extends StatefulWidget {
 	final Color themeColor;
 	final Function(Item item, bool value) setItemStocked;
 	final Function(Item item) deleteItem;
+	final Function(Item item) editItem;
 
 	const ItemView({
 		super.key, 
 		required this.items,
 		required this.themeColor,
 		this.setItemStocked = _defaultItemStocked,
-		this.deleteItem = _defaultDeleteItem
+		this.deleteItem = _defaultDeleteItem,
+		this.editItem = _defaultEditItem
 	});
 
 	static void _defaultItemStocked(Item item, bool value) {}
 	static void _defaultDeleteItem(Item item) {}
+	static void _defaultEditItem(Item item) {}
 
   @override
   State<ItemView> createState() => _ItemViewState();
@@ -46,11 +49,14 @@ class _ItemViewState extends State<ItemView> {
 			itemBuilder: (BuildContext context, int index) {
 				List<Widget> children = [
 					Expanded(
-				    	child: Text(
-					    	widget.items.elementAt(index).name,
-					    	style: const TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),
-					    ),
-				    ),
+						child: TextButton(
+							onPressed: () => widget.editItem(widget.items.elementAt(index)),
+							child: Text(
+						    	widget.items.elementAt(index).name,
+						    	style: const TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),
+						    ),
+						),
+					),
 				    Checkbox(
 				    	fillColor: WidgetStateColor.resolveWith(buttonColors),
 				    	value: widget.items.elementAt(index).stocked,
